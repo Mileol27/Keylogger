@@ -1,3 +1,6 @@
-txt="hola123"
-txt=txt[:-1]
-print(txt)
+import os
+
+email = os.environ.get("EMAIL_USER")
+passw = os.environ.get("EMAIL_PASS")
+
+print("correo {}".format(email))
